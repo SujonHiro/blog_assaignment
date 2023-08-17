@@ -1,12 +1,13 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
+import {Link} from "react-router-dom";
 
 
 const List = () => {
     const [data,setData]=useState([])
     useEffect(()=>{
         (async ()=>{
-            const res=await axios.get("http://localhost:8090/api/v1/read")
+            const res=await axios.get("https://blogsdev.onrender.com/api/v1/read")
             setData(res.data['data'])
         })()
     },[])
@@ -29,7 +30,7 @@ const List = () => {
                                                 <p className="card-text">{item['Description']}</p>
                                                 <p className="card-text"><small className="text-body-secondary">Creator By </small><small className="text-body-secondary">{item['CreatorName']}</small></p>
                                                 <p className="card-text"><small className="text-body-secondary">Create Date </small><small className="text-body-secondary">{item['CreatedDate']}</small></p>
-                                                <button className="btn btn-success me-2">Edit</button>
+                                                <Link to={"/update/"+item['_id']} className="btn btn-success me-2">Edit</Link>
                                                 <button className="btn btn-danger ">Delete</button>
                                             </div>
                                         </div>

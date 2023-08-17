@@ -1,20 +1,36 @@
-import {useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import axios from "axios";
-import {useNavigate} from "react-router-dom";
-import {toast} from "react-toastify";
+import {useNavigate, useParams} from "react-router-dom";
+//import {toast,ToastContainer} from "react-toastify";
 
 
 const CreateUpdateForm = () => {
-    const navigate=useNavigate()
+    let {id}=useParams()
     let [formValue,setFromValue]=useState({title:"",img:"",Description:"",CreatorName:""})
+    const navigate=useNavigate()
+
+        let [isTitle,setIsTitle]=useState(false)
+    let [isAuthor,SetisAuthor]=useState(false)
+    useEffect(()=>{
+        (async ()=>{
+            let res= await axios.get("https://blogsdev.onrender.com/api/v1/readBlogById/"+id)
+            setFromValue(res.data['data'][0]);
+            setIsTitle(true)
+            SetisAuthor(true)
+        })()
+    },[])
     const inputChange=(property,value)=>{
         setFromValue({...formValue,[property]:value})
     }
-      const onsubmit= async ()=>{
-       let res= await axios.post("http://localhost:8090/api/v1/create",formValue)
-          if(res.status===200){
 
-              toast.success('🦄 Wow so easy!', {
+      const onsubmit= async ()=>{
+          let URI="https://blogsdev.onrender.com/api/v1/create"
+          if(id){
+               URI="https://blogsdev.onrender.com/api/v1/update/"+id;
+          }
+       let res= await axios.post(URI,formValue)
+          if(res.status===200){
+              /*toast.success('Save Changes', {
                   position: "top-right",
                   autoClose: 5000,
                   hideProgressBar: false,
@@ -23,7 +39,8 @@ const CreateUpdateForm = () => {
                   draggable: true,
                   progress: undefined,
                   theme: "dark",
-              });
+              });*/
+              alert("save changes Successfully")
               navigate("/")
           }
       }
@@ -37,8 +54,8 @@ const CreateUpdateForm = () => {
                             <h1 className="card-header text-center">Create Form</h1>
                             <div className="col-12 p-5">
                                 <div className="mb-3">
-                                    <label className="form-label">Title</label>
-                                    <input value={formValue.title} onChange={(e)=>{inputChange('title',e.target.value)}} type="text" className="form-control" placeholder="Title Name"/>
+                                    <label  className="form-label">Title</label>
+                                    <input disabled={isTitle} value={formValue.title} onChange={(e)=>{inputChange('title',e.target.value)}} type="text" className="form-control" placeholder="Title Name"/>
                                 </div>
                                 <div className="mb-3">
                                     <label className="form-label">Images</label>
@@ -46,7 +63,7 @@ const CreateUpdateForm = () => {
                                 </div>
                                 <div className="mb-3">
                                     <label className="form-label">Author Name</label>
-                                    <input value={formValue.CreatorName} onChange={(e)=>{inputChange('CreatorName',e.target.value)}} type="text" className="form-control" placeholder="Author Name"/>
+                                    <input disabled={isAuthor} value={formValue.CreatorName} onChange={(e)=>{inputChange('CreatorName',e.target.value)}} type="text" className="form-control" placeholder="Author Name"/>
                                 </div>
 
                                 <div className="mb-3">
@@ -57,6 +74,7 @@ const CreateUpdateForm = () => {
                                 </div>
                                 <div className="mb-3 d-flex justify-content-center">
                                     <button onClick={onsubmit} className="btn btn-outline-primary w-50">Submit</button>
+                                    {/*<ToastContainer />*/}
                                 </div>
                             </div>
                         </div>
